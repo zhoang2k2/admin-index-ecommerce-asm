@@ -1,0 +1,43 @@
+.modal-content {
+  .modal-body {
+    padding: 20px;
+    gap: 10px;
+
+    div {
+      button {
+        border: none;
+        border-radius: 7px;
+        color: #fff;
+      }
+
+      .save-btn {
+        background-color: #337ab7;
+      }
+
+      .reset-btn {
+        background-color: #f0ad4e;
+      }
+    }
+
+    form {
+      gap: 10px;
+
+      div {
+        margin: 0 !important;
+
+        label {
+          padding: 0;
+          font-weight: bold;
+        }
+
+        input {
+          border-radius: 5px;
+        }
+
+        textarea {
+          border-radius: 5px;
+        }
+      }
+    }
+  }
+}
