@@ -1,36 +1,5 @@
-// docment Addevent -> domCotentloader để localStorage product
-// Tạo 1 mảng rỗng, Khai báo key cho product
-
-// function loaddata => newproduct = {...product , keyNew }
-// Mảng rỗng push newproduct
-// ;local setitem stringify products
-// renderDomProduct
-
-// function renderDomProduct để map trả lại
-// data cho tableBody (đoạn này gần giống react để return về `` và nối chuỗi)
-// return này có innerHtml cho body
-
-// render image bằng cách add event cho img
-// let url
-// e target.files
-// Create object url <= hàm if khi dòng trên đúng
-// product = {..., image : url}
-
-
-// addevent cho btn
-
-
-// const data = parse
-// renderDom(data)
-
-// function render (data) {
-// data.map (item => {
-// return parent += `<div> ${} </div>`
-// })
-
-
 const table = document.getElementById('table-id');
-const tableItem = [];
+let tableItem = JSON.parse(localStorage.getItem('items')) || [];
 
 const idInput = document.getElementById('id');
 const nameInput = document.getElementById('name');
@@ -44,114 +13,100 @@ const categoryInput = document.getElementById('category');
 const saveBtn = document.getElementById('sav-btn');
 const resetBtn = document.getElementById('res-btn');
 
-// JSON
+document.addEventListener("DOMContentLoaded", () => {
+    renderDomElement(tableItem)
+})
+
+saveBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    addElement()
+
+});
+
 function setLocalStorage() {
     localStorage.setItem('items', JSON.stringify(tableItem))
 };
 
-function getLocalStorage() {
-    const loadData = JSON.parse(localStorage.getItem('items'));
-    tableItem.forEach(data => {
-        tableItem.push(...loadData)
-        createRow(data)
+imageInput.addEventListener('change', (e) => {
+    let url;
+
+    if (e.target.files.length > 0) {
+        const file = e.target.files[0];
+        url = URL.createObjectURL(file)
+    }
+    item = { ...item, image: url }
+})
+
+function renderDomElement(tableItem) {
+    table.innerHTML = "";
+    tableItem.map(item => {
+        const tRow = document.createElement('tr')
+        tRow.id = item.id
+        tRow.innerHTML = `
+            <th>${item.id}</th>
+            <td>${item.name}</td>
+            <td>${item.price}</td>
+            <td>${item.info}</td>
+            <td>${item.detail}</td>
+            <td><img style="width: 100px; height: 100px" src="${item.image}"}</td>
+            <td>${item.manufactor}</td>
+            <td>${item.category}</td>
+            <td><button>Edit</button></td>
+            <td><button id="del-btn" onClick="delElement(${item.id})">Delete</button></td>
+        `;
+        table.appendChild(tRow)
     })
-};
-
-function createRow() {
-    const tRow = document.createElement("tr");
-    table.appendChild(tRow);
-
-    return tRow;
 }
 
-saveBtn.addEventListener('click', (e) => {
-    e.preventDefault();
+// ADD ELEMENT
+function addElement() {
+    // if () {}
 
-    // PREVENT BLANK INPUT
-    // if (idInput.value === ""
-    //     || nameInput.value === ""
-    //     || priceInput.value === ""
-    //     || infoInput.value === ""
-    //     || detailInput.value === ""
-    //     || imageInput.value === ""
-    //     || manufactorInput.value === ""
-    //     || categoryInput.value === ""
-    // ) {
-    //     window.alert("You are missing some input!");
-    //     return;
-    // };
-
-    const tRow = createRow();
-
-    // --------------------CREATE TD--------------------
-    const idData = document.createElement("td");
-    idData.textContent = idInput.value;
-    tRow.appendChild(idData);
-
-    const nameData = document.createElement("td");
-    nameData.textContent = nameInput.value;
-    tRow.appendChild(nameData);
-
-    const priceData = document.createElement("td");
-    priceData.textContent = priceInput.value;
-    tRow.appendChild(priceData);
-
-    const infoData = document.createElement("td");
-    infoData.textContent = infoInput.value;
-    tRow.appendChild(infoData);
-
-    const detailData = document.createElement("td");
-    detailData.textContent = detailInput.value;
-    tRow.appendChild(detailData);
-
-    const imageData = document.createElement("td");
-    imageData.textContent = imageInput.value;
-    tRow.appendChild(imageData);
-
-    const manufactorData = document.createElement("td");
-    manufactorData.textContent = manufactorInput.value;
-    tRow.appendChild(manufactorData);
-
-    const categoryData = document.createElement("td");
-    categoryData.textContent = categoryInput.value;
-    tRow.appendChild(categoryData);
-
-    // --------------------CREATE BTN--------------------
-    // EDIT BTN
-    const editBtn = document.createElement("button");
-    editBtn.id = 'editBtn';
-    editBtn.textContent = 'Edit';
-
-    const tDataOfEditBtn = document.createElement("td");
-    tDataOfEditBtn.appendChild(editBtn);
-    tRow.appendChild(tDataOfEditBtn);
-
-    // DEL BTN
-    const delBtn = document.createElement("button");
-    delBtn.id = 'delBtn';
-    delBtn.textContent = 'Delete';
-
-    const tDataOfDelBtn = document.createElement("td");
-    tDataOfDelBtn.appendChild(delBtn);
-    tRow.appendChild(tDataOfDelBtn);
-
-    // -----------------------NEW ITEM-----------------------
-
-    const newRowData = {
-        id: idInput.value,
+    // RENDER DOM
+    const item = {
+        id: Math.floor(Math.random() * 1000),
         name: nameInput.value,
         price: priceInput.value,
         info: infoInput.value,
         detail: detailInput.value,
         image: imageInput.value,
         manufactor: manufactorInput.value,
-        category: categoryInput.value,
+        category: categoryInput.value
     };
 
-    tableItem.push(newRowData);
+    const newTableItem = [...tableItem, item];
+    renderDomElement(newTableItem);
 
-    setLocalStorage()
+    // PUSH LOCAL STORAGE
+    const newItem = {
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        info: item.info,
+        detail: item.detail,
+        image: item.image,
+        manufactor: item.manufactor,
+        category: item.category
+    }
 
+    tableItem.push(newItem);
+    setLocalStorage();
+
+    clearInput()
+}
+
+// DELETE ELEMENT
+function delElement(id) {
+    tableItem = tableItem.filter(item => item.id !== id)
+    setLocalStorage();
+    renderDomElement(tableItem)
+}
+
+// EDIT ELEMENT
+
+
+// CLEAR INPUT
+function clearInput() {
     idInput.value = "";
     nameInput.value = "";
     priceInput.value = "";
@@ -159,7 +114,5 @@ saveBtn.addEventListener('click', (e) => {
     detailInput.value = "";
     imageInput.value = "";
     manufactorInput.value = "";
-    categoryInput.value = "";
-})
-
-getLocalStorage()
+    categoryInput.value = ""
+}
