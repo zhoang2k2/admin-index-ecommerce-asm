@@ -12,6 +12,7 @@ const categoryInput = document.getElementById('category');
 
 const saveBtn = document.getElementById('sav-btn');
 const resetBtn = document.getElementById('res-btn');
+const loadBtn = document.getElementById('load-btn')
 
 document.addEventListener("DOMContentLoaded", () => {
     renderDomElement(tableItem)
@@ -20,7 +21,6 @@ document.addEventListener("DOMContentLoaded", () => {
 saveBtn.addEventListener('click', (e) => {
     e.preventDefault();
     addElement()
-
 });
 
 function setLocalStorage() {
@@ -33,8 +33,8 @@ imageInput.addEventListener('change', (e) => {
     if (e.target.files.length > 0) {
         const file = e.target.files[0];
         url = URL.createObjectURL(file)
-    }
-    item = { ...item, image: url }
+    };
+    item = { ...item, image: url };
 })
 
 function renderDomElement(tableItem) {
@@ -74,6 +74,16 @@ function addElement() {
         category: categoryInput.value
     };
 
+    fetch("http://localhost:3000/product", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(item),
+    }).then(data => {
+        console.log("data", data);
+    })
+
     const newTableItem = [...tableItem, item];
     renderDomElement(newTableItem);
 
@@ -100,6 +110,15 @@ function delElement(id) {
     tableItem = tableItem.filter(item => item.id !== id)
     setLocalStorage();
     renderDomElement(tableItem)
+
+    fetch(`http://localhost:3000/product/${id}`, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+        },
+    }).then(data => {
+        console.log("data", data);
+    })
 }
 
 // EDIT ELEMENT
