@@ -1,8 +1,13 @@
 // BASE
 @import "base/reset/reset.scss";
 
-// COMPONENT
-@import "component/filterSection/filterSection.scss";
-@import "component/productSection/productSection.scss";
-@import "component/searchBox/searchBox.scss";
-@import "component/modal/modal.scss";
+// INDEX COMPONENTS
+@import "component/index/header/navbar/navbar.scss";
+@import "component/index/header/banner/banner.scss";
+@import "component/index/header/subBanner/subBanner.scss";
+
+// ADMIN COMPONENTS
+@import "component/admin/filterSection/filterSection.scss";
+@import "component/admin/productSection/productSection.scss";
+@import "component/admin/searchBox/searchBox.scss";
+@import "component/admin/modal/modal.scss";
