@@ -12,20 +12,37 @@ const categoryInput = document.getElementById('category');
 
 const saveBtn = document.getElementById('sav-btn');
 const resetBtn = document.getElementById('res-btn');
-const loadBtn = document.getElementById('load-btn')
+const closeBtn = document.getElementById('close-btn');
+
+const modalAddNewEl = document.getElementById("modal-add-new");
+const modalAddNew = new bootstrap.Modal(modalAddNewEl);
+const modalBody = document.querySelector(".modal-body");
+const modalTitle = document.querySelector(".modal-title");
+
+let isSaved = false;
+let countId = 0;
+
 
 document.addEventListener("DOMContentLoaded", () => {
     renderDomElement(tableItem)
 })
 
+// ADD BTN
 saveBtn.addEventListener('click', (e) => {
     e.preventDefault();
     addElement()
+    modalAddNew.hide()
 });
+
+// RESET BTN
+resetBtn.addEventListener('click', () => {
+    clearInput()
+})
 
 function setLocalStorage() {
     localStorage.setItem('items', JSON.stringify(tableItem))
 };
+
 
 imageInput.addEventListener('change', (e) => {
     let url;
@@ -37,13 +54,14 @@ imageInput.addEventListener('change', (e) => {
     item = { ...item, image: url };
 })
 
+// RENDER ELEMENT
 function renderDomElement(tableItem) {
     table.innerHTML = "";
-    tableItem.map(item => {
+    tableItem.map((item, index) => {
         const tRow = document.createElement('tr')
         tRow.id = item.id
         tRow.innerHTML = `
-            <th>${item.id}</th>
+            <th>${index + 1}</th>
             <td>${item.name}</td>
             <td>${item.price}</td>
             <td>${item.info}</td>
@@ -51,20 +69,20 @@ function renderDomElement(tableItem) {
             <td><img style="width: 100px; height: 100px" src="${item.image}"}</td>
             <td>${item.manufactor}</td>
             <td>${item.category}</td>
-            <td><button>Edit</button></td>
+            <td><button onClick="editElement(${item.id})">Edit</button></td>
             <td><button id="del-btn" onClick="delElement(${item.id})">Delete</button></td>
         `;
         table.appendChild(tRow)
     })
 }
 
-// ADD ELEMENT
+// CREATE ELEMENT
 function addElement() {
     // if () {}
 
     // RENDER DOM
     const item = {
-        id: Math.floor(Math.random() * 1000),
+        id: ++countId,
         name: nameInput.value,
         price: priceInput.value,
         info: infoInput.value,
@@ -122,6 +140,39 @@ function delElement(id) {
 }
 
 // EDIT ELEMENT
+function editElement(id) {
+    modalAddNew.show()
+
+    const selected = tableItem.find(item => item.id === id)
+
+    if (selected) {
+        idInput.value = id;
+        nameInput.value = selected.name;
+        priceInput.value = selected.price;
+        infoInput.value = selected.info;
+        detailInput.value = selected.detail;
+        imageInput.value = selected.image;
+        manufactorInput.value = selected.manufactor;
+        categoryInput.value = selected.category
+    }
+
+    isSaved = false;
+
+    saveBtn.addEventListener('click', () => {
+        isSaved = true;
+        clickSaveBtn(id);
+    });
+
+}
+
+// AFTER EDIT
+function clickSaveBtn(id) {
+    if (isSaved) {
+        tableItem = tableItem.filter(item => item.id !== id);
+    }
+    setLocalStorage()
+    renderDomElement(tableItem)
+}
 
 
 // CLEAR INPUT
