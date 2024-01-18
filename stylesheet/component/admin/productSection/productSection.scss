@@ -25,8 +25,17 @@
     tbody {
       tr {
         td {
-          .del-btn {
+          button {
             color: #fff;
+            width: 100%;
+            padding: 10px 20px;
+          }
+
+          .edit-btn {
+            background-color: #efa943;
+          }
+
+          .del-btn {
             background-color: #d9534f;
           }
         }

@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // ADD BTN
 saveBtn.addEventListener('click', (e) => {
     e.preventDefault();
-    addElement()
+    addElement();
     modalAddNew.hide()
 });
 
@@ -46,40 +46,46 @@ function setLocalStorage() {
 
 imageInput.addEventListener('change', (e) => {
     let url;
+    let item = {};
 
     if (e.target.files.length > 0) {
         const file = e.target.files[0];
         url = URL.createObjectURL(file)
     };
     item = { ...item, image: url };
+    const previewImage = document.getElementById('preview-image');
+    previewImage.src = url;
 })
 
 // RENDER ELEMENT
 function renderDomElement(tableItem) {
     table.innerHTML = "";
     tableItem.map((item, index) => {
+        // FORMAT CURRENCE
+        let priceVnd = item.price
+        priceVnd = priceVnd.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+
         const tRow = document.createElement('tr')
-        tRow.id = item.id
+        tRow.id = Math.random()
         tRow.innerHTML = `
             <th>${index + 1}</th>
             <td>${item.name}</td>
             <td>${item.price}</td>
             <td>${item.info}</td>
             <td>${item.detail}</td>
-            <td><img style="width: 100px; height: 100px" src="${item.image}"}</td>
+            <td><img style="width: 100px; height: 100px" src="${item.image}" alt="pic"}></td>
             <td>${item.manufactor}</td>
             <td>${item.category}</td>
-            <td><button onClick="editElement(${item.id})">Edit</button></td>
-            <td><button id="del-btn" onClick="delElement(${item.id})">Delete</button></td>
+            <td><button class="edit-btn" onClick="editElement(${item.id})">Edit</button></td>
+            <td><button class="del-btn" onClick="delElement(${item.id})">Delete</button></td>
         `;
+
         table.appendChild(tRow)
     })
 }
 
 // CREATE ELEMENT
 function addElement() {
-    // if () {}
-
     // RENDER DOM
     const item = {
         id: ++countId,
@@ -129,7 +135,7 @@ function delElement(id) {
     setLocalStorage();
     renderDomElement(tableItem)
 
-    fetch(`http://localhost:3000/product/${id}`, {
+    fetch(`http://localhost:3000/product/:${id}`, {
         method: "DELETE",
         headers: {
             "Content-Type": "application/json",
@@ -173,7 +179,6 @@ function clickSaveBtn(id) {
     setLocalStorage()
     renderDomElement(tableItem)
 }
-
 
 // CLEAR INPUT
 function clearInput() {

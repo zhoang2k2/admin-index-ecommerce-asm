@@ -13,6 +13,8 @@
     </head>
     <body>
         <div class="container">
+            <a href="./index.html">Home</a>
+
             <section class="row mt-5">
                 <div class="col-2">
                     <div class="filter-content">
@@ -117,15 +119,24 @@
                                 </div>
                                 <div class="row d-flex flex-column">
                                     <label for="image">Image</label>
-                                    <input id="image" type="file">
+                                    <input id="image" type="file"
+                                        accept="image/*">
                                 </div>
                                 <div class="row d-flex flex-column">
                                     <label for="manufactor">manufactor</label>
-                                    <input id="manufactor" type="text">
+                                    <select id="manufactor">
+                                        <option value="apple">apple</option>
+                                        <option value="samsung">samsung</option>
+                                        <option value="bphone">bphone</option>
+                                    </select>
                                 </div>
                                 <div class="row d-flex flex-column">
                                     <label for="category">category</label>
-                                    <input id="category" type="text">
+                                    <select id="category">
+                                        <option value="tablet">tablet</option>
+                                        <option value="laptop">laptop</option>
+                                        <option value="pc">pc</option>
+                                    </select>
                                 </div>
                             </form>
                             <div class="d-flex mt-3">

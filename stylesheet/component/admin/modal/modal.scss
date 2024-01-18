@@ -30,12 +30,11 @@
           font-weight: bold;
         }
 
-        input {
-          border-radius: 5px;
-        }
-
-        textarea {
-          border-radius: 5px;
+        input,
+        textarea,
+        select {
+          border-radius: 5px !important;
+          padding: 5px 10px !important;
         }
       }
     }
