@@ -21,16 +21,9 @@ const modalAddNew = new bootstrap.Modal(modalAddNewEl);
 const modalBody = document.querySelector(".modal-body");
 const modalTitle = document.querySelector(".modal-title");
 
+let imgUploadName = ""
+
 let isSaved = false;
-let countId = 0;
-
-function setLocalStorage(key, value) {
-    return localStorage.setItem(key, JSON.stringify(value))
-};
-
-function getLocalStorage(key) {
-    return JSON.parse(localStorage.getItem(key));
-}
 
 // AUTHORIZATION API
 let headers = new Headers();
@@ -43,6 +36,26 @@ function authorization() {
     headers.set('Content-Type', 'application/json')
 }
 
+// FIRST LOAD PAGE
+document.addEventListener("DOMContentLoaded", () => {
+    fetchData()
+})
+
+async function fetchData() {
+    try {
+        const data = await getData();
+        if (Array.isArray(data.content)) {
+            tableItem = data.content
+            renderDomElement(data.content);
+        } else {
+            console.log("Not an Array");
+        }
+    } catch (error) {
+        console.log("error");
+    }
+}
+
+// GET ALL DATA FROM API
 async function getData() {
     authorization();
     const response = await fetch("http://localhost:8080/api/v1/products", { headers });
@@ -50,79 +63,7 @@ async function getData() {
     return data
 }
 
-async function postData(data) {
-    authorization();
-    const response = await fetch("http://localhost:8080/api/v1/products", {
-        method: "POST",
-        headers: headers,
-        body: JSON.stringify({
-            name: data.name,
-            price: data.price,
-            info: data.info,
-            detail: data.detail,
-            ratingStar: data.ratingStar,
-            imageName: "Reno7NEW.jpg",
-            manufacturerId: "4",
-            categoryId: "4"
-        })
-    })
-    const responseData = await response.json();
-    return responseData;
-}
-
-function deleteData(dataId) {
-    authorization();
-    fetch(`http://localhost:8080/api/v1/products/${dataId}`, {
-        method: "GET",
-        headers: headers,
-    }).then(data => {
-        console.log(data);
-        console.log(dataId);
-    })
-
-    fetch(`http://localhost:8080/api/v1/products/${dataId}`, {
-        method: "DELETE",
-        headers: headers,
-    }).then(data => {
-        console.log(data);
-        const delItem = document.getElementById(dataId);
-        const items = getLocalStorage("items");
-        delItem.remove()
-        const removedItem = items.filter(item => item.id !== dataId);
-        setLocalStorage("items", removedItem);
-        renderDomElement(removedItem)
-    })
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-    renderDomElement(tableItem)
-})
-
-loadBtn.addEventListener('click', async () => {
-    try {
-        const data = await getData();
-        if (Array.isArray(data.content)) {
-            renderDomElement(data.content);
-        } else {
-            console.log("Error");
-        }
-    } catch (error) {
-        console.log("error");
-    }
-});
-
-// ADD BTN
-saveBtn.addEventListener('click', async (e) => {
-    e.preventDefault();
-    await addElement();
-    modalAddNew.hide()
-});
-
-// RESET BTN
-resetBtn.addEventListener('click', () => {
-    clearInput()
-})
-
+// WORKING WITH IMAGE
 imageInput.addEventListener('change', (e) => {
     let url;
     let item = {};
@@ -130,17 +71,50 @@ imageInput.addEventListener('change', (e) => {
     if (e.target.files.length > 0) {
         const file = e.target.files[0];
         url = URL.createObjectURL(file)
+        imgUploadName = file.name
     };
     item = { ...item, imageName: url };
     const previewImage = document.getElementById('preview-image');
     previewImage.src = url;
 })
 
+// OPTION VALUE
+const manufactorData = [
+    { value: 1, label: "SAMSUNG" },
+    { value: 2, label: "APPLE" },
+    { value: 3, label: "XIAOMI" },
+    { value: 4, label: "OPPO" }
+];
+
+const categoryData = [
+    { value: 1, label: "Điện thoại" },
+    { value: 2, label: "Laptop" },
+    { value: 3, label: "Tablet" }
+];
+
+function createOptions(selectedId, dataArray) {
+    const selectedElement = document.getElementById(selectedId);
+
+    dataArray.forEach(data => {
+        const optionElement = document.createElement("option");
+        optionElement.value = data.value;
+        optionElement.textContent = data.label;
+        selectedElement.appendChild(optionElement);
+    });
+}
+
+createOptions("manufactor", manufactorData);
+createOptions("category", categoryData);
+
 // RENDER ELEMENT
 function renderDomElement(tableItem) {
     table.innerHTML = "";
     tableItem.map((item, index) => {
+        const manufactorIndex = index % manufactorData.length;
+        const categoryIndex = index % categoryData.length;
+
         const tRow = document.createElement('tr');
+        const imgUrl = `${window.location.origin}/imgs/${item.imageName}`
         tRow.id = item.id;
         tRow.innerHTML = `
                 <th>${index + 1}</th>
@@ -149,9 +123,9 @@ function renderDomElement(tableItem) {
                 <td>${item.info}</td>
                 <td>${item.detail}</td>
                 <td>${item.ratingStar}</td>
-                <td><img style="width: 100px; height: 100px" src="${item.imageName}" alt="pic"></td>
-                <td>${item.manufacturerId}</td>
-                <td>${item.categoryId}</td>
+                <td><img style="width: 100px; height: 100px" src="${imgUrl}" alt="pic"></td>
+                <td>${manufactorData[manufactorIndex].label}</td>
+                <td>${categoryData[categoryIndex].label}</td>
                 <td><button class="edit-btn" onClick="editElement(${item.id})">Edit</button></td>
                 <td><button class="del-btn" onClick="deleteData(${item.id})">Delete</button></td>
             `;
@@ -159,7 +133,13 @@ function renderDomElement(tableItem) {
     })
 }
 
-// CREATE ELEMENT
+// ---------------ADD DATA EVENT---------------
+saveBtn.addEventListener('click', async (e) => {
+    e.preventDefault();
+    await addElement();
+    modalAddNew.hide()
+});
+
 async function addElement() {
     const item = {
         name: nameInput.value,
@@ -167,61 +147,110 @@ async function addElement() {
         info: infoInput.value,
         detail: detailInput.value,
         ratingStar: ratingStarInput.value,
-        imageName: imageInput.value,
+        imageName: imgUploadName,
         manufacturerId: manufactorInput.value,
         categoryId: categoryInput.value
     };
 
     try {
-        const response = await postData(item);
-        console.log(response);
-    } catch (error) {
-        console.log("Error");
-    }
+        authorization();
+        const response = await fetch("http://localhost:8080/api/v1/products", {
+            method: "POST",
+            headers: headers,
+            body: JSON.stringify(item)
+        })
+        const responseData = await response.json();
+        const newTableItem = [...tableItem, responseData];
+        renderDomElement(newTableItem);
+        clearInput()
 
-    const newTableItem = [...tableItem, item];
-    renderDomElement(newTableItem);
-    clearInput()
+    } catch (error) {
+        console.log("Error", error.message);
+    }
 }
 
-// EDIT ELEMENT
-function editElement(id) {
+// ---------------EDIT ELEMENT---------------
+function editElement(dataId) {
     modalAddNew.show()
-
-    const selected = tableItem.find(item => item.id === id)
+    const selected = tableItem.find(item => item.id === dataId)
 
     if (selected) {
-        idInput.value = id;
         nameInput.value = selected.name;
         priceInput.value = selected.price;
         infoInput.value = selected.info;
         detailInput.value = selected.detail;
         ratingStarInput.value = selected.ratingStar;
-        imageInput.value = selected.imageName;
+        imageInput.value = imgUploadName;
         manufactorInput.value = selected.manufacturerId;
         categoryInput.value = selected.categoryId
     }
 
-    isSaved = false;
+    let editItemId = dataId;
 
     saveBtn.addEventListener('click', () => {
-        isSaved = true;
-        clickSaveBtn(id);
+
+        if (editItemId === dataId) {
+            const updatedItem = {
+                id: dataId,
+                name: nameInput.value,
+                price: priceInput.value,
+                info: infoInput.value,
+                detail: detailInput.value,
+                ratingStar: ratingStarInput.value,
+                imageName: imgUploadName,
+                manufacturerId: manufactorInput.value,
+                categoryId: categoryInput.value
+            }
+
+            authorization();
+            fetch(`http://localhost:8080/api/v1/products/${dataId}`, {
+                method: "PUT",
+                headers: headers,
+                body: JSON.stringify(updatedItem)
+            }).then((res) => {
+                if (res.ok) {
+                    console.log("Item updated successfully");
+                    const updatedTableItem = tableItem.map(item => {
+                        if (item.id === editItemId) {
+                            return updatedItem;
+                        }
+                        return item;
+                    })
+                    renderDomElement(updatedTableItem);
+                    clearInput();
+                    editItemId = null;
+                } else {
+                    console.log("Error updating item");
+                };
+            }).catch(error => {
+                console.log("Error", error);
+            });
+        }
     });
-
 }
 
-// AFTER EDIT
-function clickSaveBtn(id) {
-    if (isSaved) {
-        tableItem = tableItem.filter(item => item.id !== id);
-    }
-    renderDomElement(tableItem)
+// ---------------------DELETE DATA---------------------
+function deleteData(dataId) {
+    authorization();
+    fetch(`http://localhost:8080/api/v1/products/${dataId}`, {
+        method: "DELETE",
+        headers: headers,
+    }).then(async () => {
+        const data = await getData();
+        tableItem = data.content
+        renderDomElement(data.content);
+    }).catch(error => {
+        console.log("Error", error);
+    });
 }
+
+// ------------------RESET BTN EVENT------------------
+resetBtn.addEventListener('click', () => {
+    clearInput()
+})
 
 // CLEAR INPUT
 function clearInput() {
-    idInput.value = "";
     nameInput.value = "";
     priceInput.value = "";
     infoInput.value = "";
