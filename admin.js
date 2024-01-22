@@ -21,10 +21,6 @@ const modalAddNew = new bootstrap.Modal(modalAddNewEl);
 const modalBody = document.querySelector(".modal-body");
 const modalTitle = document.querySelector(".modal-title");
 
-let imgUploadName = ""
-
-let isSaved = false;
-
 // AUTHORIZATION API
 let headers = new Headers();
 let username = 'Username1';
@@ -46,7 +42,7 @@ async function fetchData() {
         const data = await getData();
         if (Array.isArray(data.content)) {
             tableItem = data.content
-            renderDomElement(data.content);
+            renderDomElement(tableItem);
         } else {
             console.log("Not an Array");
         }
@@ -63,7 +59,9 @@ async function getData() {
     return data
 }
 
-// WORKING WITH IMAGE
+// -----------------WORKING WITH IMAGE-----------------
+let imgUploadName = ""
+
 imageInput.addEventListener('change', (e) => {
     let url;
     let item = {};
@@ -78,7 +76,7 @@ imageInput.addEventListener('change', (e) => {
     previewImage.src = url;
 })
 
-// OPTION VALUE
+// -----------------OPTION VALUE-----------------
 const manufactorData = [
     { value: 1, label: "SAMSUNG" },
     { value: 2, label: "APPLE" },
@@ -88,8 +86,8 @@ const manufactorData = [
 
 const categoryData = [
     { value: 1, label: "Điện thoại" },
-    { value: 2, label: "Laptop" },
-    { value: 3, label: "Tablet" }
+    { value: 2, label: "Tablet" },
+    { value: 3, label: "Laptop" }
 ];
 
 function createOptions(selectedId, dataArray) {
@@ -106,16 +104,15 @@ function createOptions(selectedId, dataArray) {
 createOptions("manufactor", manufactorData);
 createOptions("category", categoryData);
 
-// RENDER ELEMENT
+// ------------------------RENDER ELEMENT------------------------
 function renderDomElement(tableItem) {
     table.innerHTML = "";
     tableItem.map((item, index) => {
-        const manufactorIndex = index % manufactorData.length;
-        const categoryIndex = index % categoryData.length;
-
         const tRow = document.createElement('tr');
-        const imgUrl = `${window.location.origin}/imgs/${item.imageName}`
         tRow.id = item.id;
+
+        const imgUrl = `${window.location.origin}/imgs/${item.imageName}`
+
         tRow.innerHTML = `
                 <th>${index + 1}</th>
                 <td>${item.name}</td>
@@ -123,9 +120,9 @@ function renderDomElement(tableItem) {
                 <td>${item.info}</td>
                 <td>${item.detail}</td>
                 <td>${item.ratingStar}</td>
-                <td><img style="width: 100px; height: 100px" src="${imgUrl}" alt="pic"></td>
-                <td>${manufactorData[manufactorIndex].label}</td>
-                <td>${categoryData[categoryIndex].label}</td>
+                <td><img style="width: 100px; height: 100px" src="${imgUrl}"></td>
+                <td>${item.manufacturerName}</td>
+                <td>${item.categoryName}</td>
                 <td><button class="edit-btn" onClick="editElement(${item.id})">Edit</button></td>
                 <td><button class="del-btn" onClick="deleteData(${item.id})">Delete</button></td>
             `;
