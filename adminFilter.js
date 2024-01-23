@@ -1,3 +1,5 @@
+const searchInput = document.getElementById('search-input');
+const searchBtn = document.getElementById('search-btn');
 const manufacturerFilter = document.getElementById('filter-by-manufacturer');
 const categoryFilter = document.getElementById('filter-by-category');
 
@@ -35,3 +37,22 @@ function filterByCategory(label) {
     renderDomElement(filtered)
     console.log(filtered);
 }
+
+// ----------------------SEARCH----------------------
+function search() {
+    const keyword = searchInput.value.toLowerCase();
+    console.log(keyword);
+
+    const filteredItem = tableItem.filter(item => {
+        return item.name.toLowerCase().includes(keyword)
+    })
+
+    console.log(filteredItem);
+    renderDomElement(filteredItem)
+}
+
+searchBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    search()
+    searchInput.value = ""
+})
