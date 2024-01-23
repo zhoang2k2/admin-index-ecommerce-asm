@@ -43,19 +43,14 @@
             color: #fff;
             width: 100%;
             padding: 10px 20px;
-
-            &:hover {
-              scale: 1.2;
-              transition: 0.25s ease-in-out;
-            }
           }
 
           .edit-btn {
-            background-color: #efa943;
+            @include button(#efa943);
           }
 
           .del-btn {
-            background-color: #d9534f;
+            @include button(#d9534f);
           }
         }
       }

@@ -12,17 +12,7 @@
   }
 
   button {
-    font-weight: bold;
     width: 10%;
-    color: #5cb85c;
-    background-color: #fff;
-    border: 3px solid #5cb85c;
-    border-radius: 7px;
-    transition: 0.25s ease-in-out;
-
-    &:hover {
-      background-color: #5cb85c;
-      color: #fff;
-    }
+    @include button(#5cb85c);
   }
 }
